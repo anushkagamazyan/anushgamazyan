@@ -89,29 +89,3 @@ public class Autoassociator {
         return true;
     }
 }
-
-public class CourseArray {
-    private int[][] courses;
-
-    // Constructor
-    public CourseArray(int[][] courses) {
-        this.courses = courses;
-    }
-
-    // Method to get a specified timeslot as an array of 1 and -1 values
-    public int[] getTimeSlot(int index) {
-        int numCourses = courses.length;
-        int[] timeSlot = new int[numCourses];
-
-        for (int i = 0; i < numCourses; i++) {
-            timeSlot[i] = courses[i][index];
-        }
-
-        return timeSlot;
-    }
-
-    // Method to get the number of courses
-    public int getNumCourses() {
-        return courses.length;
-    }
-}
