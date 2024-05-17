@@ -1,0 +1,4 @@
+Shifts: Increasing the shift value from 6 to 11 resulted in a reduction in minimum clashes from 21 to 14.
+Iterations: With 5 iterations, the clashes decreased gradually with each step, similar to the first two logs.
+Summary: Consistent with the previous observations, higher shift values contributed to better optimization, leading to fewer clashes.
+

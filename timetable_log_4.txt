@@ -1,0 +1,4 @@
+Shift = 3	Min clashes = 24	at step 3
+Shift = 5	Min clashes = 20	at step 4
+Shift = 8	Min clashes = 16	at step 5
+

@@ -1,0 +1,4 @@
+Shifts: Increasing the shift value from 5 to 10 resulted in a reduction in the minimum clashes from 20 to 15.
+Iterations: With 5 iterations, the clashes decreased gradually with each step.
+Summary: Higher shift values led to better optimization, and increasing the number of iterations contributed to further reduction in clashes.
+

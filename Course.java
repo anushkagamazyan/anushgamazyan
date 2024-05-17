@@ -7,7 +7,8 @@ public class Course {
 	
 	public Course() {
 		clashesWith = new Vector<Course>();
- 	}
+		mySlot = 0;
+	}
 	
 	public Course(int newSlot) {
 		clashesWith = new Vector<Course>();

@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.util.Arrays;
 import javax.swing.*;
 
 public class TimeTable extends JFrame implements ActionListener {
@@ -8,9 +10,9 @@ public class TimeTable extends JFrame implements ActionListener {
     private JButton tool[];
     private JTextField field[];
     private CourseArray courses;
-    private Autoassociator autoassociator;
-    private int lastStep = 0;
     private Color CRScolor[] = {Color.RED, Color.GREEN, Color.BLACK};
+    private LogFile logFile;
+    private Autoassociator autoassociator;
 
     public TimeTable() {
         super("Dynamic Time Table");
@@ -22,15 +24,21 @@ public class TimeTable extends JFrame implements ActionListener {
 
         setTools();
         add(tools);
+        try {
+            String clashFileName = field[2].getText();
+            logFile = new LogFile("/Users/anushgamazyan/Downloads/testttt/timetable_log.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         setVisible(true);
     }
 
     public void setTools() {
-        String capField[] = {"Slots:", "Courses:", "CRS File:", "STU File:", "Iters:", "Shift:"}; // Updated field names
+        String capField[] = {"Slots:", "Courses:", "Clash File:", "Iters:", "Shift:"};
         field = new JTextField[capField.length];
 
-        String capButton[] = {"Load", "Start", "Step", "Print", "Exit", "Start (with Autoassociator)"}; // Updated buttons
+        String capButton[] = {"Load", "Start", "Step", "Print", "Exit", "Continue"};
         tool = new JButton[capButton.length];
 
         tools.setLayout(new GridLayout(2 * capField.length + capButton.length, 1));
@@ -47,11 +55,10 @@ public class TimeTable extends JFrame implements ActionListener {
             tools.add(tool[i]);
         }
 
-        field[0].setText("17");
+        field[0].setText("10");
         field[1].setText("381");
-        field[2].setText("sta-f-83.crs"); // Default CRS file
-        field[3].setText("sta-f-83.stu"); // Default STU file
-        field[4].setText("1");
+        field[2].setText("hec-s-92.stu");
+        field[3].setText("1");
     }
 
     public void draw() {
@@ -72,7 +79,7 @@ public class TimeTable extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent click) {
-        int min, step, clashes;
+        int min = 0, step = 0, clashes = 0;
 
         switch (getButtonIndex((JButton) click.getSource())) {
             case 0:
@@ -85,9 +92,8 @@ public class TimeTable extends JFrame implements ActionListener {
                 min = Integer.MAX_VALUE;
                 step = 0;
                 for (int i = 1; i < courses.length(); i++) courses.setSlot(i, 0);
-
-                for (int iteration = 1; iteration <= Integer.parseInt(field[4].getText()); iteration++) {
-                    courses.iterate(Integer.parseInt(field[5].getText()));
+                for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+                    courses.iterate(Integer.parseInt(field[4].getText()));
                     draw();
                     clashes = courses.clashesLeft();
                     if (clashes < min) {
@@ -95,11 +101,12 @@ public class TimeTable extends JFrame implements ActionListener {
                         step = iteration;
                     }
                 }
-                System.out.println("Shift = " + field[5].getText() + "\tMin clashes = " + min + "\tat step " + step);
+                System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
                 setVisible(true);
+                logFile.write("Iterations = " + field[3].getText() + "\tShift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
                 break;
             case 2:
-                courses.iterate(Integer.parseInt(field[5].getText()));
+                courses.iterate(Integer.parseInt(field[4].getText()));
                 draw();
                 break;
             case 3:
@@ -111,27 +118,116 @@ public class TimeTable extends JFrame implements ActionListener {
                 System.exit(0);
             case 5:
                 min = Integer.MAX_VALUE;
-                step = lastStep;
-                clashes = courses.clashesLeft();
-
-                for (int iteration = 1; iteration <= Integer.parseInt(field[4].getText()); iteration++) {
-                    courses.iterate(Integer.parseInt(field[5].getText()));
-                    autoassociator.training(courses.getTimeSlot(1)); // Assuming timeslots are stored for the first course
-                    draw();
-                    clashes = courses.clashesLeft();
-                    if (clashes < min) {
-                        min = clashes;
-                        step += iteration;
+                step = 0;
+                if (courses.clashesLeft() > 0) {
+                    for (int iteration = 1; iteration <= Integer.parseInt(field[3].getText()); iteration++) {
+                        courses.iterate(Integer.parseInt(field[4].getText()));
+                        draw();
+                        clashes = courses.clashesLeft();
+                        if (clashes < min) {
+                            min = clashes;
+                            step = iteration;
+                        }
                     }
+                    System.out.println("Shift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
+                    logFile.write("Iterations = " + field[3].getText() + "\tShift = " + field[4].getText() + "\tMin clashes = " + min + "\tat step " + step);
+                    setVisible(true);
+                } else {
+                    System.out.println("The number of clashes is 0. The algorithm is complete.");
                 }
-                lastStep = step;
-                System.out.println("Shift = " + field[5].getText() + "\tMin clashes = " + min + "\tat step " + step);
-                setVisible(true);
-                break;
+        }
+    }
+
+    public void trainAutoassociatorWithClashFreeSlots(int[] clashFreeSlots) {
+        autoassociator = new Autoassociator(courses);
+        autoassociator.training(clashFreeSlots);
+    }
+
+    public boolean isClashFree(int slotIndex) {
+        for (int i = 1; i < courses.length(); i++) {
+            if (courses.slot(i) == slotIndex && courses.status(i) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int[] findClashFreeSlots(int numSlots) {
+        int[] clashFreeSlots = new int[numSlots];
+        int count = 0;
+
+        for (int i = 0; i < numSlots; i++) {
+            if (isClashFree(i)) {
+                clashFreeSlots[count++] = i;
+            }
+        }
+
+        return Arrays.copyOf(clashFreeSlots, count);
+    }
+
+    public void saveUsedTimeSlotsLog(int numSlots, int shift, int iteration, int[] usedTimeSlots) {
+        try {
+            logFile = new LogFile("/Users/anushgamazyan/Downloads/testttt/used_time_slots_log.txt");
+            logFile.write("Number of Slots: " + numSlots);
+            logFile.write("Shift: " + shift);
+            logFile.write("Iteration Index: " + iteration);
+            logFile.write("Used Time Slots: " + Arrays.toString(usedTimeSlots));
+            logFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeLogFile() {
+        logFile.close();
+    }
+    
+    public void interruptIterationsWithUnitUpdates(int iterations, int shifts) {
+        for (int i = 1; i <= iterations; i++) {
+            tool[2].doClick(); 
+            int[] clashFreeSlots = findClashFreeSlots(Integer.parseInt(field[0].getText()));
+            trainAutoassociatorWithClashFreeSlots(clashFreeSlots);
+            saveUsedTimeSlotsLog(Integer.parseInt(field[0].getText()), shifts, i, clashFreeSlots);
+            int[] updatedSlots = new int[]{autoassociator.unitUpdate(clashFreeSlots)};
+
+            for (int j = 0; j < updatedSlots.length; j++) {
+                saveUnitUpdateLog(i, j, clashFreeSlots[j], updatedSlots[j]);
+            }
+        }
+    }
+
+    public void saveUnitUpdateLog(int iteration, int index, int originalSlot, int updatedSlot) {
+        try {
+            logFile = new LogFile("/Users/anushgamazyan/Downloads/testttt/unit_update_log.txt"); 
+            logFile.write("Iteration: " + iteration + ", Index: " + index +
+                    ", Original Slot: " + originalSlot + ", Updated Slot: " + updatedSlot);
+            logFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        new TimeTable();
+        TimeTable timeTable = new TimeTable();
+
+        timeTable.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                timeTable.closeLogFile(); 
+                System.exit(0);
+            }
+        });
+
+        timeTable.field[0].setText("10");
+        timeTable.field[1].setText("381");
+        timeTable.field[2].setText("hec-s-92.stu");
+        timeTable.field[3].setText("4");
+        timeTable.field[4].setText("7");
+        timeTable.tool[0].doClick(); 
+        timeTable.tool[1].doClick(); 
+
+        int iterations = Integer.parseInt(timeTable.field[3].getText());
+        int shifts = Integer.parseInt(timeTable.field[4].getText());
+        timeTable.interruptIterationsWithUnitUpdates(iterations, shifts);
     }
 }

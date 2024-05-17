@@ -9,7 +9,7 @@ public class CourseArray {
     public CourseArray(int numOfCourses, int numOfSlots) {
         period = numOfSlots;
         elements = new Course[numOfCourses];
-        for (int i = 1; i < elements.length; i++) 
+        for (int i = 1; i < elements.length; i++)
             elements[i] = new Course();
     }
 
@@ -30,8 +30,7 @@ public class CourseArray {
 
                     for (i = 0; i < index.length; i++)
                         for (j = 0; j < index.length; j++)
-                            if (j != i)
-                            {
+                            if (j != i) {
                                 k = 0;
                                 while (k < elements[index[i]].clashesWith.size() && elements[index[i]].clashesWith.elementAt(k) != elements[index[j]])
                                     k++;
@@ -43,9 +42,7 @@ public class CourseArray {
                 count = line.countTokens();
             }
             file.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
         }
     }
 
@@ -80,7 +77,7 @@ public class CourseArray {
     public void iterate(int shifts) {
         for (int index = 1; index < elements.length; index++) {
             elements[index].setForce();
-            for (int move = 1; move <= shifts && elements[index].force != 0; move++) { 
+            for (int move = 1; move <= shifts && elements[index].force != 0; move++) {
                 elements[index].setForce();
                 elements[index].shift(period);
             }
@@ -90,5 +87,14 @@ public class CourseArray {
     public void printResult() {
         for (int i = 1; i < elements.length; i++)
             System.out.println(i + "\t" + elements[i].mySlot);
+    }
+
+    // New method to get timeslot as an int array
+    public int[] getTimeSlot(int index) {
+        int[] timeSlot = new int[period];
+        for (int i = 0; i < period; i++) {
+            timeSlot[i] = (elements[index].mySlot == i) ? 1 : -1;
+        }
+        return timeSlot;
     }
 }

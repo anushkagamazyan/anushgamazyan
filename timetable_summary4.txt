@@ -1,0 +1,3 @@
+Shifts: With a lower shift value range (3 to 8), there was still a reduction in clashes from 24 to 16.
+Iterations: The clashes decreased gradually with each step, similar to other logs.
+Summary: Even with lower shift values, there was still an improvement in optimization, albeit not as significant as with higher shift values.

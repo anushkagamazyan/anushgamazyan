@@ -1,0 +1,3 @@
+Shifts: Similar to timetable_log_2.txt, increasing the shift value from 4 to 9 resulted in a reduction in minimum clashes from 23 to 15.
+Iterations: The clashes decreased gradually with each step, similar to other logs.
+Summary: Higher shift values still led to better optimization, although the rate of improvement may vary.
