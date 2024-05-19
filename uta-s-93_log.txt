@@ -1,0 +1,12 @@
+Shift = 1    Iterations = 10    Slots = 10    Min clashes = 15    at step 7
+Shift = 1    Iterations = 20    Slots = 10    Min clashes = 12    at step 18
+Shift = 1    Iterations = 30    Slots = 10    Min clashes = 9    at step 25
+
+Shift = 2    Iterations = 10    Slots = 20    Min clashes = 14    at step 9
+Shift = 2    Iterations = 20    Slots = 20    Min clashes = 10    at step 17
+Shift = 2    Iterations = 30    Slots = 20    Min clashes = 8    at step 23
+
+Shift = 3    Iterations = 10    Slots = 30    Min clashes = 13    at step 8
+Shift = 3    Iterations = 20    Slots = 30    Min clashes = 11    at step 19
+Shift = 3    Iterations = 30    Slots = 30    Min clashes = 7    at step 26
+

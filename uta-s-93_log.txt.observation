@@ -1,0 +1,3 @@
+Shift 1: The number of clashes decreases steadily with more iterations, showing significant improvement at 20 and 30 iterations. The optimal step is typically found near the later stages of the iterations.
+Shift 2: This shows a slight improvement over Shift 1, with fewer clashes at similar steps. This indicates that a higher shift value may allow the algorithm to explore better solutions faster.
+Shift 3: This trend continues with even better results, especially in the 30-iteration case, where the minimum clashes reach a low of 7. This suggests that increasing the shift value can be beneficial for reducing the number of clashes.
